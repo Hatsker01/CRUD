@@ -1,0 +1,427 @@
+definitions:
+  models.Countries:
+    properties:
+      countries:
+        items:
+          $ref: '#/definitions/models.CountryResponse'
+        type: array
+    type: object
+  models.CountryResponse:
+    properties:
+      country_id:
+        type: string
+      id:
+        type: string
+      probability:
+        type: number
+      user_id:
+        type: string
+    type: object
+  models.CreateCountry:
+    properties:
+      country_id:
+        type: string
+      probability:
+        type: number
+      user_id:
+        type: string
+    type: object
+  models.Empty:
+    type: object
+  models.Error:
+    properties:
+      message:
+        type: string
+    type: object
+  models.StandardErrorModel:
+    properties:
+      error:
+        $ref: '#/definitions/models.Error'
+    type: object
+  models.UpdateCountry:
+    properties:
+      country_id:
+        type: string
+      id:
+        type: string
+      probability:
+        type: number
+      user_id:
+        type: string
+    type: object
+  models.UpdateUser:
+    properties:
+      gender:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      patronymic:
+        type: string
+      surname:
+        type: string
+    type: object
+  models.UserCountry:
+    properties:
+      country_id:
+        type: string
+      probability:
+        type: number
+    type: object
+  models.UserCreate:
+    properties:
+      gender:
+        type: string
+      name:
+        type: string
+      patronymic:
+        type: string
+      surname:
+        type: string
+    type: object
+  models.UserResponse:
+    properties:
+      gender:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      patronymic:
+        type: string
+      surname:
+        type: string
+    type: object
+  models.UserWithCountry:
+    properties:
+      country:
+        items:
+          $ref: '#/definitions/models.UserCountry'
+        type: array
+      name:
+        type: string
+    type: object
+  models.Users:
+    properties:
+      users:
+        items:
+          $ref: '#/definitions/models.UserResponse'
+        type: array
+    type: object
+info:
+  contact: {}
+paths:
+  /v1/country:
+    post:
+      consumes:
+      - application/json
+      description: This API for creating Country
+      parameters:
+      - description: Country
+        in: body
+        name: country
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateCountry'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.CountryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+      summary: Create Country
+      tags:
+      - country
+    put:
+      consumes:
+      - application/json
+      description: This API for updating Country
+      parameters:
+      - description: Update_Country
+        in: body
+        name: country
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateCountry'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CountryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+      summary: Update Country
+      tags:
+      - country
+  /v1/country/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: This API for deleting country by id
+      parameters:
+      - description: country_id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Empty'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+      summary: Delete Country
+      tags:
+      - country
+    get:
+      consumes:
+      - application/json
+      description: This API for getting single country by id
+      parameters:
+      - description: country_id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CountryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+      summary: Get Single Country
+      tags:
+      - country
+  /v1/country/user/{id}:
+    get:
+      consumes:
+      - application/json
+      description: This API for getting user countries
+      parameters:
+      - description: user_id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Countries'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+      summary: Get User Countries
+      tags:
+      - country
+  /v1/user:
+    get:
+      consumes:
+      - application/json
+      description: This API for getting all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Users'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+      summary: Get all users
+      tags:
+      - user
+    post:
+      consumes:
+      - application/json
+      description: This API for creating user
+      parameters:
+      - description: Create_user
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+      summary: Create user
+      tags:
+      - user
+    put:
+      consumes:
+      - application/json
+      description: This API for updating user
+      parameters:
+      - description: Update_user
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+      summary: Update user
+      tags:
+      - user
+  /v1/user/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: This API for deleting user by ID
+      parameters:
+      - description: user_id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Empty'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+      summary: Delete User
+      tags:
+      - user
+    get:
+      consumes:
+      - application/json
+      description: This API for getting single user by id
+      parameters:
+      - description: user_id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+      summary: Get Single user
+      tags:
+      - user
+  /v1/user/country/{id}:
+    get:
+      consumes:
+      - application/json
+      description: This API for getting user with countries
+      parameters:
+      - description: user_id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserWithCountry'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.StandardErrorModel'
+      summary: Get User with Country
+      tags:
+      - user
+swagger: "2.0"
