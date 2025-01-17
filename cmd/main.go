@@ -1,14 +1,16 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/CRUD/api"
 	"github.com/CRUD/config"
 	"github.com/CRUD/pkg/logger"
+	"github.com/CRUD/storage"
+	"github.com/jackc/pgx/v4"
 
 	gormadapter "github.com/casbin/gorm-adapter/v2"
-	"github.com/jmoiron/sqlx"
 )
 
 func main() {
@@ -22,7 +24,10 @@ func main() {
 		cfg.PostgresPassword,
 		cfg.PostgresDatabase,
 	)
-	connDB, err := sqlx.Connect("postgres", psqlString)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	connDB, err := pgx.Connect(ctx, psqlString)
+	// connDB, err := sqlx.Connect("postgres", psqlString)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -33,10 +38,14 @@ func main() {
 		log.Error("new adapter error", logger.Error(err))
 
 	}
+
+	storage := storage.NewStoragePg(connDB, log)
+
 	server := api.New(api.Option{
-		Db:     connDB,
-		Conf:   cfg,
-		Logger: log,
+		Db:      connDB,
+		Conf:    cfg,
+		Logger:  log,
+		Storage: storage,
 	})
 
 	if err := server.Run(cfg.HTTPPort); err != nil {

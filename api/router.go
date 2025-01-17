@@ -5,16 +5,18 @@ import (
 	v1 "github.com/CRUD/api/handler/v1"
 	"github.com/CRUD/config"
 	"github.com/CRUD/pkg/logger"
+	"github.com/CRUD/storage"
 	"github.com/gin-gonic/gin"
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v4"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Option struct {
-	Db     *sqlx.DB
-	Conf   config.Config
-	Logger logger.Logger
+	Db      *pgx.Conn
+	Conf    config.Config
+	Logger  logger.Logger
+	Storage storage.IStorage
 }
 
 func New(option Option) *gin.Engine {
@@ -23,9 +25,10 @@ func New(option Option) *gin.Engine {
 		gin.Recovery(),
 	)
 	handlerV1 := v1.New(&v1.HandlerV1Config{
-		Db:     option.Db,
-		Logger: option.Logger,
-		Cfg:    option.Conf,
+		Db:      option.Db,
+		Logger:  option.Logger,
+		Cfg:     option.Conf,
+		Storage: option.Storage,
 	})
 	api := router.Group("/v1")
 

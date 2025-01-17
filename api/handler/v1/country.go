@@ -1,11 +1,12 @@
 package v1
 
 import (
+	"context"
 	"net/http"
+	"time"
 
 	"github.com/CRUD/pkg/logger"
 	"github.com/CRUD/pkg/models"
-	"github.com/CRUD/storage/postgres"
 	"github.com/gin-gonic/gin"
 )
 
@@ -33,7 +34,10 @@ func (h *handlerV1) CreateCountry(c *gin.Context) {
 		return
 	}
 
-	newCountry, err := postgres.NewCountryRepasitory(h.db).Create(&country)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	newCountry, err := h.storage.CountryService().Create(ctx, &country)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -67,7 +71,10 @@ func (h *handlerV1) UpdateCountry(c *gin.Context) {
 		return
 	}
 
-	updatedCountry, err := postgres.NewCountryRepasitory(h.db).Update(&updateCountry)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	updatedCountry, err := h.storage.CountryService().Update(ctx, &updateCountry)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -93,7 +100,10 @@ func (h *handlerV1) UpdateCountry(c *gin.Context) {
 func (h *handlerV1) GetSingleCountry(c *gin.Context) {
 	countryID := c.Param("id")
 
-	singleCountry, err := postgres.NewCountryRepasitory(h.db).Get(countryID)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	singleCountry, err := h.storage.CountryService().Get(ctx, countryID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -120,7 +130,10 @@ func (h *handlerV1) DeleteCountry(c *gin.Context) {
 
 	countryId := c.Param("id")
 
-	if err := postgres.NewCountryRepasitory(h.db).Delete(countryId); err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	if err := h.storage.CountryService().Delete(ctx, countryId); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -144,7 +157,10 @@ func (h *handlerV1) GetUserCountries(c *gin.Context) {
 
 	userID := c.Param("id")
 
-	countries, err := postgres.NewCountryRepasitory(h.db).GetUserCountry(userID)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	countries, err := h.storage.CountryService().GetUserCountry(ctx, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),

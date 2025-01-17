@@ -1,11 +1,12 @@
 package v1
 
 import (
+	"context"
 	"net/http"
+	"time"
 
 	"github.com/CRUD/pkg/logger"
 	"github.com/CRUD/pkg/models"
-	"github.com/CRUD/storage/postgres"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,7 +32,10 @@ func (h *handlerV1) CreateUser(c *gin.Context) {
 		return
 	}
 
-	newUser, err := postgres.NewUsersRepasitory(h.db).Create(&user)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	newUser, err := h.storage.UserService().Create(ctx, &user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -64,7 +68,10 @@ func (h *handlerV1) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	updatedUser, err := postgres.NewUsersRepasitory(h.db).Update(&updateUser)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	updatedUser, err := h.storage.UserService().Update(ctx, &updateUser)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -90,7 +97,10 @@ func (h *handlerV1) UpdateUser(c *gin.Context) {
 func (h *handlerV1) GetSingleUser(c *gin.Context) {
 	userID := c.Param("id")
 
-	singleUser, err := postgres.NewUsersRepasitory(h.db).Get(userID)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	singleUser, err := h.storage.UserService().Get(ctx, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -114,7 +124,10 @@ func (h *handlerV1) GetSingleUser(c *gin.Context) {
 // @Router /v1/user [GET]
 func (h *handlerV1) GetAllUsers(c *gin.Context) {
 
-	users, err := postgres.NewUsersRepasitory(h.db).GetAll()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	users, err := h.storage.UserService().GetAll(ctx)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -140,7 +153,10 @@ func (h *handlerV1) GetAllUsers(c *gin.Context) {
 func (h *handlerV1) DeleteUser(c *gin.Context) {
 	userID := c.Param("id")
 
-	err := postgres.NewUsersRepasitory(h.db).DeleteUser(userID)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	err := h.storage.UserService().DeleteUser(ctx, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -168,7 +184,10 @@ func (h *handlerV1) GetUserWithCountry(c *gin.Context) {
 		userID = c.Param("id")
 	)
 
-	singleUser, err := postgres.NewUsersRepasitory(h.db).Get(userID)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	singleUser, err := h.storage.UserService().Get(ctx, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -177,7 +196,7 @@ func (h *handlerV1) GetUserWithCountry(c *gin.Context) {
 		return
 	}
 
-	userCountry, err := postgres.NewCountryRepasitory(h.db).GetUserWithCountry(userID)
+	userCountry, err := h.storage.CountryService().GetUserWithCountry(ctx, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
